@@ -1,4 +1,4 @@
-import { useState } from 'react' // <--- Borra el useEffect de aquí
+import { useState } from 'react' 
 import { supabase } from './supabase
 
 export default function App() {
