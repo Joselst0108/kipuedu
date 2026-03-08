@@ -1,5 +1,5 @@
 import { useState } from 'react' 
-import { supabase } from './supabase"
+import { supabase } from './supabase' // <-- Corregido: comilla cerrada
 
 export default function App() {
   const [user, setUser] = useState<any>(null)
@@ -7,6 +7,11 @@ export default function App() {
   const [dni, setDni] = useState('')
   const [pass, setPass] = useState('')
   const [alumnos, setAlumnos] = useState<any[]>([])
+
+  async function fetchAlumnos() {
+    const { data } = await supabase.from('alumnos').select('*')
+    if (data) setAlumnos(data)
+  }
 
   async function manejarLogin(e: any) {
     e.preventDefault()
@@ -23,11 +28,6 @@ export default function App() {
         setUser(data)
         fetchAlumnos()
     }
-  }
-
-  async function fetchAlumnos() {
-    const { data } = await supabase.from('alumnos').select('*')
-    if (data) setAlumnos(data)
   }
 
   if (!user) {
@@ -56,14 +56,19 @@ export default function App() {
         </nav>
       </aside>
       <main style={{ flex: 1, padding: '30px', background: '#f8f9fa' }}>
-        <h1>{view.toUpperCase()}</h1>
-        <p>Bienvenido, {user.nombre} ({user.rol})</p>
+        <h1 style={{ color: '#202124' }}>{view.toUpperCase()}</h1>
+        <p>Bienvenido, <strong>{user.nombre}</strong> ({user.rol})</p>
         <hr />
         {view === 'alumnos' && (
-            <ul>
-                {alumnos.map(a => <li key={a.id}>{a.nombre} {a.apellido}</li>)}
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+                {alumnos.map(a => (
+                  <li key={a.id} style={{ background: 'white', padding: '10px', marginBottom: '5px', borderRadius: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                    {a.nombre} {a.apellido} - {a.grado}
+                  </li>
+                ))}
             </ul>
         )}
+        {view === 'inicio' && <p>Selecciona una opción del menú para comenzar.</p>}
       </main>
     </div>
   )
