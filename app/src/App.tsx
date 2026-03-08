@@ -29,7 +29,15 @@ export default function App() {
         fetchAlumnos()
     }
   }
-
+const navBtnStyle = { 
+  textAlign: 'left' as const, 
+  background: 'none', 
+  border: 'none', 
+  color: 'white', 
+  cursor: 'pointer',
+  padding: '10px',
+  fontSize: '16px'
+};
   if (!user) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f0f2f5', fontFamily: 'sans-serif' }}>
@@ -49,11 +57,17 @@ export default function App() {
     <div style={{ display: 'flex', height: '100vh', fontFamily: 'sans-serif' }}>
       <aside style={{ width: '240px', background: '#202124', color: 'white', padding: '20px' }}>
         <h2>EduAdmin</h2>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
-          <button onClick={() => setView('inicio')} style={{ textAlign: 'left', background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>🏠 Inicio</button>
-          <button onClick={() => setView('alumnos')} style={{ textAlign: 'left', background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>👥 Alumnos</button>
-          <button onClick={() => setUser(null)} style={{ textAlign: 'left', background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', marginTop: '20px' }}>Cerrar Sesión</button>
-        </nav>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+  <button onClick={() => setView('inicio')} style={navBtnStyle}>🏠 Inicio</button>
+  <button onClick={() => setView('alumnos')} style={navBtnStyle}>👥 Alumnos</button>
+  
+  {/* Lógica para mostrar Reportes solo a rangos altos */}
+  {(user.rol === 'superadmin' || user.rol === 'director') && (
+    <button onClick={() => setView('reportes')} style={navBtnStyle}>📊 Reportes</button>
+  )}
+
+  <button onClick={() => setUser(null)} style={{ ...navBtnStyle, color: '#ff6b6b', marginTop: '20px' }}>Cerrar Sesión</button>
+</nav>
       </aside>
       <main style={{ flex: 1, padding: '30px', background: '#f8f9fa' }}>
         <h1 style={{ color: '#202124' }}>{view.toUpperCase()}</h1>
