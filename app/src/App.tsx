@@ -1,70 +1,60 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
 
-interface Alumno {
-  id: string
-  nombre: string
-  apellido: string
-  grado: string
-}
-
 function App() {
-  const [alumnos, setAlumnos] = useState<Alumno[]>([])
-  const [nombre, setNombre] = useState('')
-  const [apellido, setApellido] = useState('')
-  const [grado, setGrado] = useState('')
+  const [alumnos, setAlumnos] = useState<any[]>([])
+  const [mensaje, setMensaje] = useState('')
 
   useEffect(() => {
-    getAlumnos()
+    fetchAlumnos()
   }, [])
 
-  async function getAlumnos() {
-    const { data } = await supabase.from('alumnos').select('*').order('created_at', { ascending: false })
+  async function fetchAlumnos() {
+    const { data } = await supabase.from('alumnos').select('*').eq('estado', true)
     if (data) setAlumnos(data)
   }
 
-  async function agregarAlumno(e: React.FormEvent) {
-    e.preventDefault()
-    if (!nombre || !apellido) return
-
+  async function marcarAsistencia(alumnoId: string, estuvoPresente: boolean) {
     const { error } = await supabase
-      .from('alumnos')
-      .insert([{ nombre, apellido, grado }])
+      .from('asistencia')
+      .insert([
+        { alumno_id: alumnoId, presente: estuvoPresente, fecha: new Date().toISOString().split('T')[0] }
+      ])
 
     if (error) {
-      alert('Error al guardar: ' + error.message)
+      setMensaje('Error: ' + error.message)
     } else {
-      setNombre(''); setApellido(''); setGrado('');
-      getAlumnos() // Refresca la lista automáticamente
+      setMensaje('✅ Asistencia guardada correctamente')
+      setTimeout(() => setMensaje(''), 3000)
     }
   }
 
   return (
-    <div style={{ padding: '40px', backgroundColor: '#1a1a1a', color: 'white', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>🏫 Panel KipuEdu</h1>
+    <div style={{ padding: '30px', fontFamily: 'sans-serif', backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
+      <h1 style={{ color: '#2c3e50' }}>KipuEdu: Control de Asistencia</h1>
+      <p style={{ color: '#7f8c8d' }}>Fecha de hoy: {new Date().toLocaleDateString()}</p>
+      
+      {mensaje && <div style={{ padding: '10px', backgroundColor: '#d4edda', color: '#155724', marginBottom: '20px', borderRadius: '5px' }}>{mensaje}</div>}
 
-      {/* --- FORMULARIO NUEVO --- */}
-      <form onSubmit={agregarAlumno} style={{ background: '#333', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
-        <h3>Registrar Nuevo Alumno</h3>
-        <input placeholder="Nombre" value={nombre} onChange={e => setNombre(e.target.value)} style={inputStyle} />
-        <input placeholder="Apellido" value={apellido} onChange={e => setApellido(e.target.value)} style={inputStyle} />
-        <input placeholder="Grado (ej: 3ero)" value={grado} onChange={e => setGrado(e.target.value)} style={inputStyle} />
-        <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#4da6ff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Guardar Alumno</button>
-      </form>
-
-      {/* --- LISTA --- */}
-      <h3>Lista de Estudiantes:</h3>
-      <ul>
+      <div style={{ display: 'grid', gap: '15px' }}>
         {alumnos.map((alumno) => (
-          <li key={alumno.id} style={{ marginBottom: '10px', fontSize: '18px' }}>
-            {alumno.nombre} {alumno.apellido} - <span style={{ color: '#4da6ff' }}>{alumno.grado}</span>
-          </li>
+          <div key={alumno.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+            <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{alumno.nombre} {alumno.apellido}</span>
+            <div>
+              <button 
+                onClick={() => marcarAsistencia(alumno.id, true)}
+                style={{ backgroundColor: '#27ae60', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', marginRight: '10px' }}
+              >Presente</button>
+              <button 
+                onClick={() => marcarAsistencia(alumno.id, false)}
+                style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer' }}
+              >Faltó</button>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
-
-const inputStyle = { padding: '10px', marginRight: '10px', borderRadius: '4px', border: '1px solid #555' }
 
 export default App
