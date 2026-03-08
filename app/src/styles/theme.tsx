@@ -1,12 +1,15 @@
 export const theme = {
   colors: {
-    primary: '#1a73e8',
-    sidebar: '#1a1c23',
-    background: '#f8f9fa',
-    text: '#2d3748',
+    primary: '#3182ce',    // Azul Kipu
+    secondary: '#2d3748',  // Gris oscuro
+    success: '#48bb78',    // Verde
+    danger: '#e53e3e',     // Rojo
+    warning: '#ed8936',    // Naranja
+    background: '#f7fafc', // Fondo claro
     white: '#ffffff',
-    danger: '#cf1322'
+    dark: '#1a1c23'        // Fondo Sidebar
   },
-  shadow: '0 4px 6px rgba(0,0,0,0.05)',
-  radius: '12px'
+  fonts: {
+    main: "'Inter', sans-serif"
+  }
 };

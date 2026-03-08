@@ -1,8 +1,7 @@
-import React from 'react';
 import { menuConfig } from './menuLogic';
 import './sidebar.css';
 
-// La interfaz DEBE coincidir con lo que envías desde App.tsx
+// Esta interfaz es CRUCIAL. Debe tener exactamente 10 propiedades.
 interface SidebarProps {
   user: any;
   currentApp: string;
@@ -29,11 +28,12 @@ export function Sidebar({
   setSelectedLevel 
 }: SidebarProps) {
   
-  // Verificamos que la configuración exista, si no, cargamos eduadmin por defecto
+  // Obtenemos la configuración de la app actual (EduAdmin, EduBank, etc.)
   const config = menuConfig[currentApp] || menuConfig['eduadmin'];
 
   return (
     <aside className="sidebar-container">
+      {/* CABECERA: Logo y Selectores de contexto */}
       <div className="sidebar-header">
         <h2 className="brand-logo">{config.icon} {config.title}</h2>
         
@@ -64,17 +64,19 @@ export function Sidebar({
         </div>
       </div>
 
+      {/* NAVEGACIÓN: Menús dinámicos por Rol */}
       <nav className="sidebar-nav">
         {config.sections.map((section: any) => {
-          // Filtro de seguridad por rol de sección
-          if (!section.roles.includes(user.rol)) return null;
+          // Si el rol del usuario no está permitido en la sección, ocultarla
+          if (!section.roles.includes(user?.rol)) return null;
 
           return (
             <div key={section.label} className="nav-section">
               <p className="section-title">{section.label}</p>
               {section.items.map((item: any) => {
-                // Filtro de seguridad por rol de item
-                if (item.roles && !item.roles.includes(user.rol)) return null;
+                // Filtro adicional por item si tiene roles específicos
+                if (item.roles && !item.roles.includes(user?.rol)) return null;
+                
                 return (
                   <button 
                     key={item.id}
@@ -91,13 +93,14 @@ export function Sidebar({
         })}
       </nav>
 
+      {/* LANZADOR DE APPS (Cambiar entre EduAdmin, EduBank, etc.) */}
       <div className="app-switcher">
         <p className="section-title">CAMBIAR MÓDULO</p>
         <div className="switcher-grid">
-          <button title="EduAdmin" onClick={() => setCurrentApp('eduadmin')}>🛡️</button>
-          <button title="EduAsist" onClick={() => setCurrentApp('eduasist')}>📝</button>
-          <button title="EduBank" onClick={() => setCurrentApp('edubank')}>💰</button>
-          <button title="EduIA" onClick={() => setCurrentApp('eduia')}>🤖</button>
+          <button title="EduAdmin" onClick={() => { setCurrentApp('eduadmin'); setView('inicio'); }}>🛡️</button>
+          <button title="EduAsist" onClick={() => { setCurrentApp('eduasist'); setView('inicio'); }}>📝</button>
+          <button title="EduBank" onClick={() => { setCurrentApp('edubank'); setView('inicio'); }}>💰</button>
+          <button title="EduIA" onClick={() => { setCurrentApp('eduia'); setView('inicio'); }}>🤖</button>
         </div>
       </div>
 
