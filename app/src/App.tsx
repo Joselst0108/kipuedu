@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { supabase } from './supabase'
+import { useState } from 'react' // <--- Borra el useEffect de aquí
+import { supabase } from './supabase
 
 export default function App() {
   const [user, setUser] = useState<any>(null)
